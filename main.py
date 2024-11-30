@@ -1,10 +1,7 @@
-# HyperTiles Dash
-
-# Author : Prajjwal Pathak (pyguru)
-# Date : Thursday, 29 July, 2021
-
 import random
 import pygame
+import json
+import os
 
 from objects import Tile, Player, SkullCircle, Particle, Message, BlinkingText, Button
 
@@ -103,6 +100,21 @@ p = Player(win, tile_group)
 # FUNCTIONS *******************************************************************
 
 deadly_tiles_list = []
+
+def load_highscore():
+    try:
+        with open("highscore.json", "r") as file:
+            data = json.load(file)
+            return data.get("highscore", 0)
+    except FileNotFoundError:
+        # Se o arquivo não existir, retorna 0
+        return 0
+
+def save_highscore(highscore):
+    with open("highscore.json", "w") as file:
+        json.dump({"highscore": highscore}, file)
+
+highscore = load_highscore()
 
 def get_index():
 	if p.tile_type == 1:
@@ -333,6 +345,9 @@ while running:
 			score_page = True
 			score_page_fx.play()
 
+			# Salvar o highscore ao final do jogo
+			save_highscore(highscore)
+
 			deadly_tiles_list.clear()
 
 			for tile in tile_group:
@@ -341,6 +356,7 @@ while running:
 				tile.is_deadly_tile = False
 
 			final_score = Message(WIDTH//3, HEIGHT//2 - 20, 90, f'{score}', score_font, WHITE, win)
+
 
 
 	pygame.draw.rect(win, WHITE, (0, 0, WIDTH, HEIGHT), 5, border_radius=10)
